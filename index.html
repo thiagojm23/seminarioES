@@ -1,294 +1,588 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Ecossistema Interativo da Qualidade de Software</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
     <!-- Chosen Palette: Warm Neutral (Slate) -->
     <!-- Application Structure Plan: A two-tier navigation system. The top level switches between a deep-dive on 'Análise de Normas' (content provided by user) and the practical 'Ecossistema de Ferramentas'. The second tier, within 'Ecossistema', uses tabs (Processo, Produto, Comunicação) for focused exploration. This structure separates theoretical foundations from practical application, allowing the user to switch contexts easily. -->
     <!-- Visualization & Content Choices: Normas -> Structured text with styled cards for each standard to improve readability. Ecossistema: Processo -> Detailed text cards explaining key concepts. Produto -> HTML/CSS Flow Diagram for workflow visualization. Comunicação -> HTML/CSS Hub-and-Spoke Diagram. Tool names (Jira, Figma) are highlighted with tags for prominence. CONFIRMING NO SVG/Mermaid. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* slate-50 */
-        }
-        .main-nav-btn {
-            transition: all 0.3s ease;
-        }
-        .main-nav-btn.active {
-            background-color: #3b82f6; /* blue-500 */
-            color: #ffffff;
-        }
-        .sub-nav-btn {
-            transition: all 0.3s ease;
-            border-bottom: 4px solid transparent;
-        }
-        .sub-nav-btn.active {
-            border-bottom-color: #3b82f6; /* blue-500 */
-            color: #1e293b; /* slate-800 */
-        }
-        .main-section, .sub-content-section {
-            display: none;
-        }
-        .main-section.active, .sub-content-section.active {
-            display: block;
-        }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8fafc; /* slate-50 */
+      }
+      .main-nav-btn {
+        transition: all 0.3s ease;
+      }
+      .main-nav-btn.active {
+        background-color: #3b82f6; /* blue-500 */
+        color: #ffffff;
+      }
+      .sub-nav-btn {
+        transition: all 0.3s ease;
+        border-bottom: 4px solid transparent;
+      }
+      .sub-nav-btn.active {
+        border-bottom-color: #3b82f6; /* blue-500 */
+        color: #1e293b; /* slate-800 */
+      }
+      .main-section,
+      .sub-content-section {
+        display: none;
+      }
+      .main-section.active,
+      .sub-content-section.active {
+        display: block;
+      }
+      .chart-container {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+        height: 350px;
+        max-height: 400px;
+      }
+      @media (max-width: 640px) {
         .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 350px;
-            max-height: 400px;
+          height: 300px;
         }
-        @media (max-width: 640px) {
-            .chart-container {
-                height: 300px;
-            }
-        }
-        .benefit-card { background-color: #ecfdf5; border-left: 5px solid #10b981; }
-        .risk-card { background-color: #fff1f2; border-left: 5px solid #f43f5e; }
-        .flow-diagram-item {
-            position: relative;
-            flex: 1;
-            text-align: center;
-        }
-        .flow-diagram-item:not(:last-child)::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            right: -25%;
-            transform: translateY(-50%);
-            width: 50%;
-            height: 2px;
-            background-color: #cbd5e1;
-        }
-        .tool-tag {
-            background-color: #e0f2fe; /* sky-100 */
-            color: #0369a1; /* sky-800 */
-            padding: 2px 8px;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 500;
-            display: inline-block;
-            vertical-align: middle;
-        }
-        .practical-example {
-            background-color: #fefce8; /* yellow-50 */
-            border-left: 4px solid #facc15; /* yellow-400 */
-            padding: 12px;
-            margin-top: 16px;
-            border-radius: 4px;
-        }
+      }
+      .benefit-card {
+        background-color: #ecfdf5;
+        border-left: 5px solid #10b981;
+      }
+      .risk-card {
+        background-color: #fff1f2;
+        border-left: 5px solid #f43f5e;
+      }
+      .flow-diagram-item {
+        position: relative;
+        flex: 1;
+        text-align: center;
+      }
+      .flow-diagram-item:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        right: -25%;
+        transform: translateY(-50%);
+        width: 50%;
+        height: 2px;
+        background-color: #cbd5e1;
+      }
+      .tool-tag {
+        background-color: #e0f2fe; /* sky-100 */
+        color: #0369a1; /* sky-800 */
+        padding: 2px 8px;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .practical-example {
+        background-color: #fefce8; /* yellow-50 */
+        border-left: 4px solid #facc15; /* yellow-400 */
+        padding: 12px;
+        margin-top: 16px;
+        border-radius: 4px;
+      }
+      .evaluation-method {
+        background-color: #f3f4f6; /* gray-100 */
+        border-left: 4px solid #6b7280; /* gray-500 */
+        padding: 12px;
+        margin-top: 8px;
+        border-radius: 4px;
+      }
     </style>
-</head>
-<body class="text-slate-700">
-
+  </head>
+  <body class="text-slate-700">
     <div class="max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+      <header class="text-center mb-10">
+        <h1 class="text-3xl sm:text-4xl font-bold text-slate-800">
+          Qualidade de Software: Da Teoria à Prática
+        </h1>
+        <p class="mt-2 text-lg text-slate-600">
+          Uma análise interativa das normas e do ecossistema de ferramentas que
+          sustentam o desenvolvimento de alta qualidade.
+        </p>
+      </header>
 
-        <header class="text-center mb-10">
-            <h1 class="text-3xl sm:text-4xl font-bold text-slate-800">Qualidade de Software: Da Teoria à Prática</h1>
-            <p class="mt-2 text-lg text-slate-600">Uma análise interativa das normas e do ecossistema de ferramentas que sustentam o desenvolvimento de alta qualidade.</p>
-        </header>
+      <nav
+        class="flex justify-center bg-slate-200 rounded-lg p-1 mb-8 max-w-md mx-auto"
+      >
+        <button
+          id="nav-normas"
+          class="main-nav-btn w-1/2 py-2 px-4 text-lg font-medium rounded-md text-slate-600"
+        >
+          Análise de Normas
+        </button>
+        <button
+          id="nav-ecossistema"
+          class="main-nav-btn w-1/2 py-2 px-4 text-lg font-medium rounded-md text-slate-600"
+        >
+          Ecossistema de Ferramentas
+        </button>
+      </nav>
 
-        <nav class="flex justify-center bg-slate-200 rounded-lg p-1 mb-8 max-w-md mx-auto">
-            <button id="nav-normas" class="main-nav-btn w-1/2 py-2 px-4 text-lg font-medium rounded-md text-slate-600">Análise de Normas</button>
-            <button id="nav-ecossistema" class="main-nav-btn w-1/2 py-2 px-4 text-lg font-medium rounded-md text-slate-600">Ecossistema de Ferramentas</button>
-        </nav>
-
-        <main id="app-content">
-            <!-- SEÇÃO DE ANÁLISE DE NORMAS -->
-            <section id="content-normas" class="main-section">
-                 <div class="text-center mb-8">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-2">Alternativa 1: Definição e Análise de Normas</h2>
-                    <p class="max-w-3xl mx-auto text-slate-600">Esta seção foca em uma análise aprofundada de normas específicas, detalhando seus critérios, métodos de avaliação e a importância da padronização de processos para a melhoria da comunicação e competitividade.</p>
+      <main id="app-content">
+        <!-- SEÇÃO DE ANÁLISE DE NORMAS (ATUALIZADA) -->
+        <section id="content-normas" class="main-section">
+          <div class="text-center mb-8">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">
+              Definição e Critérios de Normas para Qualidade
+            </h2>
+            <p class="max-w-3xl mx-auto text-slate-600">
+              A busca pela qualidade é guiada por normas de organizações como a
+              ISO e o IEEE, que padronizam atividades e servem como um modelo de
+              maturidade para avaliar o produto e o processo de desenvolvimento.
+            </p>
+          </div>
+          <div class="space-y-8">
+            <!-- ISO 9126 Card -->
+            <div
+              class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+            >
+              <h3 class="text-xl font-bold text-slate-800 mb-2">
+                ISO/IEC 9126: Critérios para Avaliar a Qualidade do Produto
+              </h3>
+              <p class="mb-6 text-slate-600">
+                Esta norma define um modelo com seis características principais
+                que um software de qualidade deve possuir, fornecendo um
+                framework para a sua avaliação.
+              </p>
+              <div class="space-y-6">
+                <div>
+                  <h4 class="font-bold text-lg text-slate-700">
+                    1. Funcionalidade
+                  </h4>
+                  <p class="text-slate-600">
+                    Capacidade de prover funções que atendam aos requisitos
+                    explícitos e implícitos. Basicamente: o software faz o que
+                    deveria?
+                  </p>
+                  <div class="evaluation-method">
+                    <p>
+                      <strong>Método de Avaliação:</strong> Análise de
+                      conformidade de requisitos. Ex: Em um sistema de folha de
+                      pagamento, verificar se o cálculo dos impostos segue
+                      rigorosamente a legislação vigente.
+                    </p>
+                  </div>
                 </div>
-                <div class="space-y-8">
-                    <!-- ISO 9126 / 25010 Card -->
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-                        <h3 class="text-xl font-bold text-slate-800 mb-4">ISO/IEC 9126 e 25010 (SQuaRE): Qualidade de Produto</h3>
-                        <p class="mb-4 text-slate-600"><strong>Objetivo:</strong> Definir um modelo de qualidade com características e subcaracterísticas aplicável a qualquer tipo de software, avaliando a qualidade interna, externa e em uso do produto.</p>
-                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            <div class="bg-slate-50 p-3 rounded-md"><strong>Funcionalidade:</strong> Adequação, Acurácia, Interoperabilidade, Segurança.</div>
-                            <div class="bg-slate-50 p-3 rounded-md"><strong>Confiabilidade:</strong> Maturidade, Tolerância a Falhas, Recuperabilidade.</div>
-                            <div class="bg-slate-50 p-3 rounded-md"><strong>Usabilidade:</strong> Inteligibilidade, Apreensibilidade, Operacionalidade, Atratividade.</div>
-                            <div class="bg-slate-50 p-3 rounded-md"><strong>Eficiência:</strong> Comportamento em Relação ao Tempo, Utilização de Recursos.</div>
-                            <div class="bg-slate-50 p-3 rounded-md"><strong>Manutenibilidade:</strong> Analisabilidade, Modificabilidade, Estabilidade, Testabilidade.</div>
-                            <div class="bg-slate-50 p-3 rounded-md"><strong>Portabilidade:</strong> Adaptabilidade, Capacidade para ser Instalado, Coexistência.</div>
-                        </div>
-                        <div class="practical-example">
-                             <p><strong>Exemplo Prático:</strong> Em um projeto, a <strong>usabilidade</strong> é avaliada através de protótipos e testes com usuários, enquanto a <strong>eficiência</strong> é medida pelo tempo de resposta da API e consumo de memória do frontend.</p>
-                        </div>
-                    </div>
-                    <!-- ISO 12207 Card -->
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-                        <h3 class="text-xl font-bold text-slate-800 mb-4">ISO/IEC 12207: Processo de Ciclo de Vida de Software</h3>
-                         <p class="mb-4 text-slate-600"><strong>Objetivo:</strong> Estabelecer um framework comum para os processos do ciclo de vida do software, organizando atividades e tarefas para fornecer uma arquitetura completa, servindo de base para modelos como o SPICE (ISO/IEC 15504).</p>
-                         <div class="practical-example">
-                             <p><strong>Exemplo Prático:</strong> O processo de desenvolvimento de uma empresa pode se alinhar à norma ao definir claramente as fases de "Análise de Requisitos", "Desenvolvimento", "Testes" e "Implantação", com entradas e saídas bem definidas para cada uma.</p>
-                        </div>
-                    </div>
-                    <!-- IEEE 829 Card -->
-                    <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-                        <h3 class="text-xl font-bold text-slate-800 mb-4">IEEE 829: Documentação de Teste de Software</h3>
-                        <p class="mb-4 text-slate-600"><strong>Objetivo:</strong> Padronizar a documentação de testes com um framework para planejamento, execução e relatórios. A norma propõe documentos como Plano de Teste, Especificação de Teste e Relatórios de Sumário, cujo detalhamento depende da maturidade da organização.</p>
-                         <div class="practical-example">
-                             <p><strong>Exemplo Prático:</strong> Uma equipe pode usar um "Plano de Teste Mestre" para um projeto, detalhando escopo e estratégia, e "Casos de Teste" específicos para cada funcionalidade, alinhando-se com a estrutura proposta pela IEEE 829.</p>
-                        </div>
-                    </div>
+                <div>
+                  <h4 class="font-bold text-lg text-slate-700">
+                    2. Confiabilidade
+                  </h4>
+                  <p class="text-slate-600">
+                    Capacidade de manter seu desempenho sob as mesmas condições
+                    por um determinado período.
+                  </p>
+                  <div class="evaluation-method">
+                    <p>
+                      <strong>Método de Avaliação:</strong> Testes de longa
+                      duração e de carga. Ex: Operar um servidor web por 72
+                      horas contínuas sob carga simulada, verificando se não
+                      ocorrem falhas.
+                    </p>
+                  </div>
                 </div>
-            </section>
-            
-            <!-- SEÇÃO ECOSSISTEMA DE FERRAMENTAS -->
-            <section id="content-ecossistema" class="main-section">
-                <nav class="flex justify-center border-b border-slate-200 mb-8">
-                    <button id="nav-processo" class="sub-nav-btn py-4 px-6 text-lg font-medium text-slate-500 hover:bg-slate-100">Processo</button>
-                    <button id="nav-produto" class="sub-nav-btn py-4 px-6 text-lg font-medium text-slate-500 hover:bg-slate-100">Produto</button>
-                    <button id="nav-comunicacao" class="sub-nav-btn py-4 px-6 text-lg font-medium text-slate-500 hover:bg-slate-100">Comunicação</button>
-                </nav>
-
-                <div id="sub-content-wrapper">
-                    <section id="sub-content-processo" class="sub-content-section animate-fade-in">
-                        <div class="text-center mb-8">
-                            <h2 class="text-2xl font-bold text-slate-800 mb-2">Gestão e Controle da Qualidade do Processo</h2>
-                            <p class="max-w-3xl mx-auto text-slate-600">A base para um produto de qualidade reside em um processo bem definido, operacionalizado por ferramentas de gerenciamento de projetos como o <span class="tool-tag">Jira</span>.</p>
-                        </div>
-                        <div class="max-w-3xl mx-auto space-y-6">
-                            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-                                <h4 class="font-bold text-lg text-slate-800 mb-2">Modelo de Qualidade via Workflows</h4>
-                                <p class="text-slate-600">No Jira, é possível configurar fluxos de trabalho (workflows) que obrigam uma tarefa a passar por estágios específicos, como "Análise", "Desenvolvimento", "Revisão de Código" e "Testes". Isso garante que nenhuma etapa crítica de verificação seja pulada, funcionando como uma implementação prática de um modelo de qualidade de processo.</p>
-                            </div>
-                            <div class="bg-white p-6 rounded-lg shadow-md border border-slate-200">
-                                <h4 class="font-bold text-lg text-slate-800 mb-2">Gestão de Requisitos com Critérios de Aceite</h4>
-                                <p class="text-slate-600">Cada tarefa ou "história de usuário" no Jira pode conter "Critérios de Aceite" detalhados. Estes critérios definem as condições exatas que o software deve atender para que a funcionalidade seja considerada completa e com qualidade. Isso reduz a ambiguidade e alinha as expectativas entre o time de desenvolvimento, gerentes de produto e o time de QA.</p>
-                            </div>
-                        </div>
-                    </section>
-
-                    <section id="sub-content-produto" class="sub-content-section">
-                        <div class="text-center mb-8">
-                            <h2 class="text-2xl font-bold text-slate-800 mb-2">Qualidade de Produto: Usabilidade e Design</h2>
-                            <p class="max-w-3xl mx-auto text-slate-600">A qualidade percebida pelo usuário é validada com ferramentas de prototipação como o <span class="tool-tag">Figma</span>, que são cruciais para testar a experiência antes do desenvolvimento.</p>
-                        </div>
-                        <div class="bg-white p-8 rounded-lg shadow-md border border-slate-200">
-                            <h3 class="text-xl font-bold text-center text-slate-800 mb-8">Do Conceito à Implementação Fiel</h3>
-                            <div class="flex flex-col sm:flex-row justify-between items-center w-full space-y-4 sm:space-y-0">
-                                <div class="flow-diagram-item"><div class="bg-blue-500 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl">1</div><h4 class="font-semibold">Ideia</h4></div>
-                                <div class="flow-diagram-item"><div class="bg-blue-500 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl">2</div><h4 class="font-semibold">Protótipo</h4></div>
-                                <div class="flow-diagram-item"><div class="bg-blue-500 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl">3</div><h4 class="font-semibold">Validação</h4></div>
-                                <div class="flow-diagram-item"><div class="bg-blue-500 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl">4</div><h4 class="font-semibold">Implementação</h4></div>
-                            </div>
-                            <p class="text-center mt-8 text-slate-600">Este fluxo garante que a interface final seja fiel ao design, reduzindo defeitos de UI e prevenindo retrabalho.</p>
-                        </div>
-                    </section>
-
-                    <section id="sub-content-comunicacao" class="sub-content-section">
-                        <div class="text-center mb-8">
-                            <h2 class="text-2xl font-bold text-slate-800 mb-2">A Comunicação como Pilar da Qualidade</h2>
-                            <p class="max-w-3xl mx-auto text-slate-600">Ferramentas de colaboração como o <span class="tool-tag">Microsoft Teams</span> são essenciais para centralizar discussões, registrar decisões e acelerar o ciclo de feedback.</p>
-                        </div>
-                        <div class="bg-white p-8 rounded-lg shadow-md border border-slate-200">
-                            <h3 class="text-xl font-bold text-center text-slate-800 mb-8">Centralizando o Fluxo de Informação</h3>
-                            <div class="relative max-w-lg mx-auto h-80">
-                                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-500 text-white w-32 h-32 rounded-full flex items-center justify-center text-center p-2 shadow-lg"><span class="font-bold">Comunicação</span></div>
-                                <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 bg-slate-100 p-3 rounded-lg shadow-sm text-center"><p class="font-semibold">Stakeholders</p></div>
-                                <div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-4 bg-slate-100 p-3 rounded-lg shadow-sm text-center"><p class="font-semibold">Time de QA</p></div>
-                                <div class="absolute top-1/2 left-0 -translate-x-8 -translate-y-1/2 bg-slate-100 p-3 rounded-lg shadow-sm text-center"><p class="font-semibold">Designers</p></div>
-                                <div class="absolute top-1/2 right-0 translate-x-8 -translate-y-1/2 bg-slate-100 p-3 rounded-lg shadow-sm text-center"><p class="font-semibold">Devs</p></div>
-                            </div>
-                        </div>
-                    </section>
+                <div>
+                  <h4 class="font-bold text-lg text-slate-700">
+                    3. Usabilidade
+                  </h4>
+                  <p class="text-slate-600">
+                    Refere-se à facilidade com que um usuário pode aprender e
+                    utilizar o software.
+                  </p>
+                  <div class="evaluation-method">
+                    <p>
+                      <strong>Método de Avaliação:</strong> Testes de
+                      usabilidade com usuários finais. Ex: Medir o tempo que um
+                      usuário iniciante leva para completar uma compra em um
+                      e-commerce sem ajuda.
+                    </p>
+                  </div>
                 </div>
-            </section>
-        </main>
-        
-        <section class="mt-16">
-            <div class="text-center mb-8">
-                <h2 class="text-2xl font-bold text-slate-800">Balanço Final: Benefícios vs. Riscos</h2>
-                <p class="max-w-3xl mx-auto text-slate-600">A adoção de normas e ferramentas oferece vantagens claras, mas também apresenta desafios que precisam ser gerenciados ativamente.</p>
+                <div>
+                  <h4 class="font-bold text-lg text-slate-700">
+                    4. Eficiência
+                  </h4>
+                  <p class="text-slate-600">
+                    Capacidade de apresentar um desempenho satisfatório em
+                    relação à quantidade de recursos utilizados (tempo,
+                    memória).
+                  </p>
+                  <div class="evaluation-method">
+                    <p>
+                      <strong>Método de Avaliação:</strong> Análise de
+                      desempenho e profiling de código. Ex: Garantir que o
+                      consumo de bateria de um app em segundo plano não exceda
+                      5% em uma hora.
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <h4 class="font-bold text-lg text-slate-700">
+                    5. Manutenibilidade
+                  </h4>
+                  <p class="text-slate-600">
+                    Capacidade de ser modificado para corrigir defeitos,
+                    melhorar o desempenho ou adaptar-se a um novo ambiente.
+                  </p>
+                  <div class="evaluation-method">
+                    <p>
+                      <strong>Método de Avaliação:</strong> Análise estática do
+                      código-fonte (ex: complexidade ciclomática). Ex:
+                      Determinar que nenhum método crítico tenha uma
+                      complexidade ciclomática superior a 10.
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <h4 class="font-bold text-lg text-slate-700">
+                    6. Portabilidade
+                  </h4>
+                  <p class="text-slate-600">
+                    Capacidade do software de ser transferido de um ambiente
+                    para outro.
+                  </p>
+                  <div class="evaluation-method">
+                    <p>
+                      <strong>Método de Avaliação:</strong> Testes de instalação
+                      e execução em diferentes configurações. Ex: Garantir que
+                      um software instale e execute corretamente no Windows 11 e
+                      no macOS Sonoma.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="benefit-card p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-bold text-emerald-700 mb-4">Benefícios Potenciais</h3>
-                    <ul class="space-y-3 list-disc list-inside text-emerald-800">
-                        <li><b>Melhoria na Comunicação:</b> Padronização da linguagem entre equipes e empresas.</li>
-                        <li><b>Detecção Antecipada de Defeitos:</b> Processos de verificação reduzem o custo das correções.</li>
-                        <li><b>Padronização e Consistência:</b> Resulta em um produto final mais coeso e de fácil manutenção.</li>
-                        <li><b>Cultura de Melhoria Contínua:</b> As métricas geradas alimentam a identificação de ineficiências.</li>
-                    </ul>
+            <!-- ISO 12207 Card -->
+            <div
+              class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+            >
+              <h3 class="text-xl font-bold text-slate-800 mb-2">
+                ISO/IEC 12207: Critérios para Avaliar a Qualidade do Processo
+              </h3>
+              <p class="mb-4 text-slate-600">
+                Enquanto a ISO 9126 foca no produto, esta norma estabelece um
+                framework para os processos do ciclo de vida, descrevendo uma
+                arquitetura de atividades, tarefas e subtarefas que a
+                organização pode adaptar.
+              </p>
+              <div class="space-y-4">
+                <div>
+                  <h4 class="font-semibold text-slate-700">
+                    Estrutura do Processo
+                  </h4>
+                  <p class="text-slate-600">
+                    A norma define que um processo é composto por atividades,
+                    que contêm tarefas. Por exemplo, a "Atividade de Teste"
+                    inclui tarefas como "Planejar Testes" e "Executar Testes". A
+                    tarefa de planejamento teria como entrada o documento de
+                    requisitos e como saída o "Plano de Testes".
+                  </p>
                 </div>
-                <div class="risk-card p-6 rounded-lg shadow-sm">
-                    <h3 class="text-xl font-bold text-rose-700 mb-4">Riscos e Desafios</h3>
-                    <ul class="space-y-3 list-disc list-inside text-rose-800">
-                        <li><b>Excesso de Burocracia:</b> Foco excessivo na documentação em detrimento do objetivo do teste.</li>
-                        <li><b>Falta de Flexibilidade:</b> Tentar aplicar normas de forma rígida sem customização para a organização.</li>
-                        <li><b>Custo de Manutenção:</b> A configuração e integração de ferramentas exigem tempo e conhecimento.</li>
-                        <li><b>Resistência à Mudança:</b> A equipe pode resistir à adoção de novos processos ou ferramentas.</li>
-                    </ul>
+                <div>
+                  <h4 class="font-semibold text-slate-700">
+                    Método de Avaliação do Processo
+                  </h4>
+                  <p class="text-slate-600">
+                    A qualidade é avaliada pela conformidade com a estrutura.
+                    Modelos como CMMI e SPICE usam a ISO 12207 como base para
+                    auditorias, onde se verifica a existência de evidências
+                    (documentos, registros) que comprovem a execução das
+                    atividades, como o uso de um sistema de controle de versão
+                    (Git) para gerenciamento de configuração.
+                  </p>
                 </div>
+              </div>
             </div>
+          </div>
         </section>
 
+        <!-- SEÇÃO ECOSSISTEMA DE FERRAMENTAS (INALTERADA) -->
+        <section id="content-ecossistema" class="main-section">
+          <nav class="flex justify-center border-b border-slate-200 mb-8">
+            <button
+              id="nav-processo"
+              class="sub-nav-btn py-4 px-6 text-lg font-medium text-slate-500 hover:bg-slate-100"
+            >
+              Processo
+            </button>
+            <button
+              id="nav-produto"
+              class="sub-nav-btn py-4 px-6 text-lg font-medium text-slate-500 hover:bg-slate-100"
+            >
+              Produto
+            </button>
+            <button
+              id="nav-comunicacao"
+              class="sub-nav-btn py-4 px-6 text-lg font-medium text-slate-500 hover:bg-slate-100"
+            >
+              Comunicação
+            </button>
+          </nav>
+
+          <div id="sub-content-wrapper">
+            <section
+              id="sub-content-processo"
+              class="sub-content-section animate-fade-in"
+            >
+              <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">
+                  Gestão e Controle da Qualidade do Processo
+                </h2>
+                <p class="max-w-3xl mx-auto text-slate-600">
+                  A base para um produto de qualidade reside em um processo bem
+                  definido, operacionalizado por ferramentas de gerenciamento de
+                  projetos como o <span class="tool-tag">Jira</span>.
+                </p>
+              </div>
+              <div class="max-w-3xl mx-auto space-y-6">
+                <div
+                  class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+                >
+                  <h4 class="font-bold text-lg text-slate-800 mb-2">
+                    Modelo de Qualidade via Workflows
+                  </h4>
+                  <p class="text-slate-600">
+                    No Jira, é possível configurar fluxos de trabalho
+                    (workflows) que obrigam uma tarefa a passar por estágios
+                    específicos, como "Análise", "Desenvolvimento", "Revisão de
+                    Código" e "Testes". Isso garante que nenhuma etapa crítica
+                    de verificação seja pulada, funcionando como uma
+                    implementação prática de um modelo de qualidade de processo.
+                  </p>
+                </div>
+                <div
+                  class="bg-white p-6 rounded-lg shadow-md border border-slate-200"
+                >
+                  <h4 class="font-bold text-lg text-slate-800 mb-2">
+                    Gestão de Requisitos com Critérios de Aceite
+                  </h4>
+                  <p class="text-slate-600">
+                    Cada tarefa ou "história de usuário" no Jira pode conter
+                    "Critérios de Aceite" detalhados. Estes critérios definem as
+                    condições exatas que o software deve atender para que a
+                    funcionalidade seja considerada completa e com qualidade.
+                    Isso reduz a ambiguidade e alinha as expectativas entre o
+                    time de desenvolvimento, gerentes de produto e o time de QA.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section id="sub-content-produto" class="sub-content-section">
+              <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">
+                  Qualidade de Produto: Usabilidade e Design
+                </h2>
+                <p class="max-w-3xl mx-auto text-slate-600">
+                  A qualidade percebida pelo usuário é validada com ferramentas
+                  de prototipação como o <span class="tool-tag">Figma</span>,
+                  que são cruciais para testar a experiência antes do
+                  desenvolvimento.
+                </p>
+              </div>
+              <div
+                class="bg-white p-8 rounded-lg shadow-md border border-slate-200"
+              >
+                <h3 class="text-xl font-bold text-center text-slate-800 mb-8">
+                  Do Conceito à Implementação Fiel
+                </h3>
+                <div
+                  class="flex flex-col sm:flex-row justify-between items-center w-full space-y-4 sm:space-y-0"
+                >
+                  <div class="flow-diagram-item">
+                    <div
+                      class="bg-blue-500 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl"
+                    >
+                      1
+                    </div>
+                    <h4 class="font-semibold">Ideia</h4>
+                  </div>
+                  <div class="flow-diagram-item">
+                    <div
+                      class="bg-blue-500 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl"
+                    >
+                      2
+                    </div>
+                    <h4 class="font-semibold">Protótipo</h4>
+                  </div>
+                  <div class="flow-diagram-item">
+                    <div
+                      class="bg-blue-500 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl"
+                    >
+                      3
+                    </div>
+                    <h4 class="font-semibold">Validação</h4>
+                  </div>
+                  <div class="flow-diagram-item">
+                    <div
+                      class="bg-blue-500 text-white w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-2 text-2xl"
+                    >
+                      4
+                    </div>
+                    <h4 class="font-semibold">Implementação</h4>
+                  </div>
+                </div>
+                <p class="text-center mt-8 text-slate-600">
+                  Este fluxo garante que a interface final seja fiel ao design,
+                  reduzindo defeitos de UI e prevenindo retrabalho.
+                </p>
+              </div>
+            </section>
+
+            <section id="sub-content-comunicacao" class="sub-content-section">
+              <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">
+                  A Comunicação como Pilar da Qualidade
+                </h2>
+                <p class="max-w-3xl mx-auto text-slate-600">
+                  Ferramentas de colaboração como o
+                  <span class="tool-tag">Microsoft Teams</span> são essenciais
+                  para centralizar discussões, registrar decisões e acelerar o
+                  ciclo de feedback.
+                </p>
+              </div>
+              <div
+                class="bg-white p-8 rounded-lg shadow-md border border-slate-200"
+              >
+                <h3 class="text-xl font-bold text-center text-slate-800 mb-8">
+                  Centralizando o Fluxo de Informação
+                </h3>
+                <div class="relative max-w-lg mx-auto h-80">
+                  <div
+                    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-blue-500 text-white w-32 h-32 rounded-full flex items-center justify-center text-center p-2 shadow-lg"
+                  >
+                    <span class="font-bold">Comunicação</span>
+                  </div>
+                  <div
+                    class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-4 bg-slate-100 p-3 rounded-lg shadow-sm text-center"
+                  >
+                    <p class="font-semibold">Stakeholders</p>
+                  </div>
+                  <div
+                    class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-4 bg-slate-100 p-3 rounded-lg shadow-sm text-center"
+                  >
+                    <p class="font-semibold">Time de QA</p>
+                  </div>
+                  <div
+                    class="absolute top-1/2 left-0 -translate-x-8 -translate-y-1/2 bg-slate-100 p-3 rounded-lg shadow-sm text-center"
+                  >
+                    <p class="font-semibold">Designers</p>
+                  </div>
+                  <div
+                    class="absolute top-1/2 right-0 translate-x-8 -translate-y-1/2 bg-slate-100 p-3 rounded-lg shadow-sm text-center"
+                  >
+                    <p class="font-semibold">Devs</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </main>
+
+      <section class="mt-16">
+        <div class="text-center mb-8">
+          <h2 class="text-2xl font-bold text-slate-800">
+            Balanço Final: Benefícios vs. Riscos na Adoção de Normas
+          </h2>
+          <p class="max-w-3xl mx-auto text-slate-600">
+            A adoção de normas oferece um caminho estruturado para a qualidade,
+            mas exige um equilíbrio cuidadoso.
+          </p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div class="benefit-card p-6 rounded-lg shadow-sm">
+            <h3 class="text-xl font-bold text-emerald-700 mb-4">
+              Benefícios Potenciais
+            </h3>
+            <p class="text-emerald-800">
+              A principal vantagem é a melhoria na comunicação e a criação de um
+              parâmetro claro para medição, resultando em projetos com prazos e
+              custos mais controlados e maior satisfação dos usuários.
+            </p>
+          </div>
+          <div class="risk-card p-6 rounded-lg shadow-sm">
+            <h3 class="text-xl font-bold text-rose-700 mb-4">
+              Riscos e Desafios
+            </h3>
+            <p class="text-rose-800">
+              O principal risco é o foco excessivo na documentação e no
+              formalismo, perdendo de vista o objetivo de encontrar defeitos. As
+              normas devem ser um guia flexível e customizado, não um conjunto
+              inflexível de regras.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const mainNav = {
-                normas: document.getElementById('nav-normas'),
-                ecossistema: document.getElementById('nav-ecossistema')
-            };
-            const mainContents = {
-                normas: document.getElementById('content-normas'),
-                ecossistema: document.getElementById('content-ecossistema')
-            };
-            const subNav = {
-                processo: document.getElementById('nav-processo'),
-                produto: document.getElementById('nav-produto'),
-                comunicacao: document.getElementById('nav-comunicacao')
-            };
-            const subContents = {
-                processo: document.getElementById('sub-content-processo'),
-                produto: document.getElementById('sub-content-produto'),
-                comunicacao: document.getElementById('sub-content-comunicacao')
-            };
+      document.addEventListener("DOMContentLoaded", function () {
+        const mainNav = {
+          normas: document.getElementById("nav-normas"),
+          ecossistema: document.getElementById("nav-ecossistema"),
+        };
+        const mainContents = {
+          normas: document.getElementById("content-normas"),
+          ecossistema: document.getElementById("content-ecossistema"),
+        };
+        const subNav = {
+          processo: document.getElementById("nav-processo"),
+          produto: document.getElementById("nav-produto"),
+          comunicacao: document.getElementById("nav-comunicacao"),
+        };
+        const subContents = {
+          processo: document.getElementById("sub-content-processo"),
+          produto: document.getElementById("sub-content-produto"),
+          comunicacao: document.getElementById("sub-content-comunicacao"),
+        };
 
-            function activateMainView(viewName) {
-                Object.keys(mainNav).forEach(key => {
-                    const isActive = key === viewName;
-                    mainNav[key].classList.toggle('active', isActive);
-                    mainContents[key].classList.toggle('active', isActive);
-                });
-                if(viewName === 'ecossistema'){
-                    activateSubTabView('processo');
-                }
-            }
-            
-            function activateSubTabView(tabName) {
-                Object.keys(subNav).forEach(key => {
-                    const isTabActive = key === tabName;
-                    subNav[key].classList.toggle('active', isTabActive);
-                    subContents[key].classList.toggle('active', isTabActive);
-                });
-            }
+        function activateMainView(viewName) {
+          Object.keys(mainNav).forEach((key) => {
+            const isActive = key === viewName;
+            mainNav[key].classList.toggle("active", isActive);
+            mainContents[key].classList.toggle("active", isActive);
+          });
+          if (viewName === "ecossistema") {
+            activateSubTabView("processo");
+          }
+        }
 
-            Object.keys(mainNav).forEach(key => {
-                mainNav[key].addEventListener('click', () => activateMainView(key));
-            });
-            
-            Object.keys(subNav).forEach(key => {
-                subNav[key].addEventListener('click', () => activateSubTabView(key));
-            });
-            
-            activateMainView('normas');
+        function activateSubTabView(tabName) {
+          Object.keys(subNav).forEach((key) => {
+            const isTabActive = key === tabName;
+            subNav[key].classList.toggle("active", isTabActive);
+            subContents[key].classList.toggle("active", isTabActive);
+          });
+        }
+
+        Object.keys(mainNav).forEach((key) => {
+          mainNav[key].addEventListener("click", () => activateMainView(key));
         });
-    </script>
 
-</body>
+        Object.keys(subNav).forEach((key) => {
+          subNav[key].addEventListener("click", () => activateSubTabView(key));
+        });
+
+        activateMainView("normas");
+      });
+    </script>
+  </body>
 </html>
